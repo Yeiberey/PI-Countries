@@ -1,14 +1,16 @@
 require('dotenv').config();
-const { Sequelize } = require('sequelize');
+const { Sequelize, Op } = require('sequelize');
 const fs = require('fs');
 const path = require('path');
-const {
-  DB_USER, DB_PASSWORD, DB_HOST,
-} = process.env;
+const { DB_USER, DB_PASSWORD, DB_HOST, } = process.env;
 
 const sequelize = new Sequelize(`postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/countries`, {
-  logging: false, // set to console.log to see the raw SQL queries
+  logging: false, /* console.log, */ // set to console.log to see the raw SQL queries
   native: false, // lets Sequelize know we can use pg-native for ~30% more speed
+  /* define: {//detener la pluralización global
+    freezeTableName: true
+  } */
+  
 });
 const basename = path.basename(__filename);
 
@@ -22,7 +24,12 @@ fs.readdirSync(path.join(__dirname, '/models'))
   });
 
 // Injectamos la conexion (sequelize) a todos los modelos
-modelDefiners.forEach(model => model(sequelize));
+modelDefiners.forEach((model, i) => {
+  // if(i === 2){
+  //   return model(sequelize,sequelize.models.Country,sequelize.models.Activity)
+  // }
+  return model(sequelize)
+});
 // Capitalizamos los nombres de los modelos ie: product => Product
 let entries = Object.entries(sequelize.models);
 let capsEntries = entries.map((entry) => [entry[0][0].toUpperCase() + entry[0].slice(1), entry[1]]);
@@ -30,12 +37,18 @@ sequelize.models = Object.fromEntries(capsEntries);
 
 // En sequelize.models están todos los modelos importados como propiedades
 // Para relacionarlos hacemos un destructuring
-const { Pokemon } = sequelize.models;
+const { Countries, Activities } = sequelize.models;
+const Countries_Activities = sequelize.define('Countries_Activities', {}, { timestamps: false });
+console.log(sequelize.models)
 
 // Aca vendrian las relaciones
 // Product.hasMany(Reviews);
 
+Countries.belongsToMany(Activities, { through: Countries_Activities, foreignKey: 'country_id'/* , as: 'acti' */});
+Activities.belongsToMany(Countries, { through: Countries_Activities, foreignKey:  'activity_id'});
+
 module.exports = {
   ...sequelize.models, // para poder importar los modelos así: const { Product, User } = require('./db.js');
   conn: sequelize,     // para importart la conexión { conn } = require('./db.js');
+  Op,
 };
