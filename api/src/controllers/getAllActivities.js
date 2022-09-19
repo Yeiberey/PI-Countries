@@ -1,11 +1,11 @@
 const axios = require("axios");
-const { Activities } = require('../db.js');
+const { Activity } = require('../db.js');
 const { getDBCountries } = require('../controllers/getAllCountries.js');
 const { CHAR, NUMBER } = require("sequelize");
 
 const getDBActivities = async () => {
 
-    const db = await Activities.findAll()
+    const db = await Activity.findAll()
 
     // if (!db.length) {
     //     const countries = await getDBCountries()
@@ -26,10 +26,20 @@ const getDBActivities = async () => {
 }
 const getDBActivity = async (id) => {
 
-    const db = await Activities.findByPk(id)
+    const db = await Activity.findByPk(id)
+    return db;
+}
+const getDBActivityName = async (name) => {
+
+    const db = await Activity.findOne({
+        where:{
+            name
+        }
+    })
     return db;
 }
 module.exports = {
     getDBActivities,
-    getDBActivity
+    getDBActivity,
+    getDBActivityName
 }
