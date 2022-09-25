@@ -1,6 +1,5 @@
 const axios = require("axios");
 const { Activity } = require('../db.js');
-const { getDBCountries } = require('../controllers/getAllCountries.js');
 const { CHAR, NUMBER } = require("sequelize");
 
 const getDBActivities = async () => {

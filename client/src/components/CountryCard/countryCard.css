@@ -1,0 +1,41 @@
+.country_card{
+    display: grid;
+    border: 1px solid #ced4da;
+    border-radius:0.575rem;
+    padding: 10px;
+    justify-items: end;
+    margin: 10px;
+    min-width: 100px;
+    background-color: rgb(3, 92, 217);
+    box-shadow: 0 3px 13px 1px rgb(0 0 0 / 9%);
+}
+
+.title{
+    display: flex;
+    flex-direction: column;
+    text-align: right;
+    padding-right: 10px;
+    padding-left: 10px;
+    color: white;
+    min-width: 100px;
+}
+.info{
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+}
+.text{
+    display: flex;
+    flex-direction: column;
+    text-align: right;
+    padding-right: 10px;
+    padding-left: 10px;
+}
+
+img{
+    background-size: cover;
+    width: 50px;
+    height: 50px;
+    padding-bottom: 20px;
+    border-right: 3px solid gainsboro;
+}

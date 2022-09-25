@@ -27,30 +27,21 @@ const getDBCountries = async () => {
     return db
 }
 
-const getDBCountry = async (id, getDBActivities) => {
-    await getDBCountries()
-    await getDBActivities()
-    //Country.sync({ logging: console.log })
-    const country = await Country.findOne({
-
-        where: {
-            id
-        },
-            include: 'activities'
-    })
-    // if(country){
-    //     country = country.dataValues
-    //     const activities = await Activity.findAll({
-    //         where:{
-    //             country_id: country.id
-    //         }
-    //     })
-    //     country = {...country, activities }
-    // }
-    // const db = await conn.query(`SELECT c."name", count(*) as activities  FROM "countries" as c join "activities" as a on c."id" = a."country_id" GROUP BY c."name"`);
-
-
-    return country;
+const getDBCountry = async (id) => {
+    try {
+        await getDBCountries()
+        const country = await Country.findAll({
+    
+            where: {
+                id: id
+            },
+                include: 'activities'
+        })
+        return country;
+        
+    } catch (error) {
+        throw new TypeError(error)
+    }
 }
 const getDBCountryName = async ({ name, capital }) => {
     await getDBCountries()

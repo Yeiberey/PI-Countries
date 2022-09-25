@@ -21,8 +21,7 @@ router.get('/:id', async (req, res) => {
         const { id } = req.params
         if (id) {
             const country = await getDBCountry(id.toString().toUpperCase(), getDBActivities)
-            //console.log(country)
-            if (country) res.status(200).json(country)
+            if (country.length) res.status(200).json(country[0])
             else res.status(404).send(`the country ${id} does not exist`)
 
         } else {

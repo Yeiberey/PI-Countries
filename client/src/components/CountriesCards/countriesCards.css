@@ -1,0 +1,26 @@
+.countriesCards {
+  background-color: #e9f4ff;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border: 1px solid #ced4da #f96868;
+  border-radius: 0.575rem;
+  padding: 10px;
+  margin: 50px;
+  min-width: 380px;
+  box-shadow: 0 3px 15px 1px rgb(0 0 0 / 40%);
+}
+  @media (max-width: 1600px) {
+    .countriesCards {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  @media (max-width: 1600px) and (max-width: 1300px) {
+    .countriesCards {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 1600px) and (max-width: 1250px) and (max-width: 1000px) {
+    .countriesCards {
+      grid-template-columns: repeat(1, 1fr);
+    }
+  }

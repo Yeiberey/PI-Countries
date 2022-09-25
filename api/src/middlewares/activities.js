@@ -19,24 +19,29 @@ router.get('/', async (req, res) => {
 })
 
 router.post('/', async (req, res) => {
-    const { name, country_id } = req.body
-    if (name && country_id) {
+    const { name, difficulty, duration, season, countries_id } = req.body
+    if (name && countries_id && typeof countries_id === "object") {
         try {
-            const country = await getDBCountry(country_id.toString().toUpperCase(), getDBActivities)
-            if (country) {
-                const activityExiste = await getDBActivityName(name)
-                if(!activityExiste){
-                    const activity = await Activity.create({
+            const countries = await getDBCountry(countries_id.map(e => e.toString().toUpperCase()))
+            if (countries.length) {
+                const [activity, created] = await Activity.findOrCreate({
+                    where: { name },
+                    defaults: {
                         name,
-                    })
-                    await country.addActivity(activity)
-                    res.status(200).send("Activity created")
-                }else{
-                    res.status(404).send('name activity duplicate')
-                }
+                        difficulty,
+                        duration,
+                        season,
+                    },
+                })
+                let nameCountries = []
+                await countries.map(async e => {
+                    nameCountries.push(e.dataValues.name);
+                    await e.addActivity(activity)
+                })
+                res.status(200).send(`Activity created in ${nameCountries.join(', ')}`)
 
             } else {
-                res.status(404).send(`not there are country ${country_id.toString().toUpperCase()}`)
+                res.status(404).send(`Countries not found ${countries_id.join(", ").toUpperCase()}`)
             }
 
         } catch (error) {
