@@ -1,8 +1,10 @@
 import axios from 'axios'
-export const GETDBCOUNTRIESNAME = 'GETDBCOUNTRIESNAME';
+export const GETDBCOUNTRIESSEARCH = 'GETDBCOUNTRIESSEARCH';
 export const GETDBCOUNTRIES = 'GETDBCOUNTRIES';
 export const GETDBCOUNTRYDETAIL = 'GETDBCOUNTRYDETAIL';
 export const GETDBCOUNTRIESORDER = 'GETDBCOUNTRIESORDER';
+export const GETDBACTIVITIES = 'GETDBACTIVITIES';
+export const GETCOUNTRIESFILTER = 'GETCOUNTRIESFILTER';
 
 // Nuestras actions (action creators) devolverán un paquete de actions que nuestro reducer recibirá. 
 // ¿Cómo es el paquete de acción? Tengan en cuenta que el creador de la acción no es en absoluto responsable 
@@ -26,12 +28,12 @@ export const getDBCountries = () => {
   }
 };
 
-export const getDBCountriesName = (name) => {
+export const getDBCountriesSearch = (attribute,name) => {
   return (dispatch) => {
-    return axios.get(`http://localhost:3001/countries?name=${name}`)
+    return axios.get(`http://localhost:3001/countries?${attribute}=${name}`)
       .then(r => {
         return dispatch({
-          type: GETDBCOUNTRIESNAME,
+          type: GETDBCOUNTRIESSEARCH,
           payload: r.data,
         })
       })
@@ -79,3 +81,27 @@ export const postCreateActivity = (value) => {
   }
   
 }
+
+export const getDBActivities = () => {
+  return (dispatch) => {
+    return axios.get(`http://localhost:3001/activities`)
+      .then(r => {
+        return dispatch({
+          type: GETDBACTIVITIES,
+          payload: r.data,
+        })
+      })
+
+      .catch((err) => {
+        console.error(err);
+      });
+
+  }
+};
+
+export const getCountriesFilter = (countries) => {
+  return {
+          type: GETCOUNTRIESFILTER,
+          payload: countries,
+        }
+};

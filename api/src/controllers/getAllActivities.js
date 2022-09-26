@@ -4,7 +4,10 @@ const { CHAR, NUMBER } = require("sequelize");
 
 const getDBActivities = async () => {
 
-    const db = await Activity.findAll()
+    const db = await Activity.findAll({
+        include: "countries",
+        attributes: [/* "difficulty","duration", */["name","value"],["name","label"],"id","name","season"]
+    })
 
     // if (!db.length) {
     //     const countries = await getDBCountries()

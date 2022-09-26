@@ -12,13 +12,13 @@ const router = express.Router();
 // Configurar los routers
 // Ejemplo: router.use('/auth', authRouter);
 router.use(express.json())
-router.get('/countries', async (req, res,next) => {
+router.get('/countries', async (req, res, next) => {
     try {
-        const {name, capital} = req.query
-        if (name || capital) {
-            const country = await getDBCountryName({name,capital})
+        const { name, capital, continent } = req.query
+        if (name || capital || continent) {
+            const country = await getDBCountryName({ name, capital, continent })
             if (country.length) res.status(200).json(country)
-            else res.status(404).send(`the ${name?'name':'capital'} country ${name?name:capital} does not exist`)
+            else res.status(404).send(`the ${name ? 'name' : capital ? 'capital' : 'continent'} country ${name ? name : capital ? capital : continent} does not exist`)
 
         } else {
             next()

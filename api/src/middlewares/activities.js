@@ -38,7 +38,7 @@ router.post('/', async (req, res) => {
                     nameCountries.push(e.dataValues.name);
                     await e.addActivity(activity)
                 })
-                res.status(200).send(`Activity created in ${nameCountries.join(', ')}`)
+                res.status(200).send(`Activity created in ${nameCountries.length ===2?nameCountries.join(' and '):nameCountries.join(', ')}.`)
 
             } else {
                 res.status(404).send(`Countries not found ${countries_id.join(", ").toUpperCase()}`)

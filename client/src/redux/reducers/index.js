@@ -1,8 +1,9 @@
-import { GETDBCOUNTRIESNAME, GETDBCOUNTRIES, GETDBCOUNTRYDETAIL, GETDBCOUNTRIESORDER } from '../actions';
+import { GETDBCOUNTRIESSEARCH, GETDBCOUNTRIES, GETDBCOUNTRYDETAIL, GETDBCOUNTRIESORDER, GETDBACTIVITIES, GETCOUNTRIESFILTER } from '../actions';
 
 const initialState = {
   countryDetail: {},
-  countries: []
+  countries: [],
+  activities: []
 }
 
 const rootReducer = (state = initialState, { payload, type }) => {
@@ -15,7 +16,7 @@ const rootReducer = (state = initialState, { payload, type }) => {
       return {
         ...state, countries: payload,
       }
-    case GETDBCOUNTRIESNAME:
+    case GETDBCOUNTRIESSEARCH:
       return {
         ...state, countries: payload,
       }
@@ -37,6 +38,14 @@ const rootReducer = (state = initialState, { payload, type }) => {
       }
       return {
         ...state, countries: array,
+      }
+    case GETDBACTIVITIES:
+      return {
+        ...state, activities: payload,
+      }
+    case GETCOUNTRIESFILTER:
+      return {
+        ...state, countries: payload,
       }
     default:
       return state;

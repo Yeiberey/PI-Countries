@@ -1,28 +1,53 @@
 import "./home.css";
 import { Link } from "react-router-dom";
-import { getDBCountries, getDBCountriesName, getCountriesOrder } from "../../redux/actions"
+import { getDBCountries, getDBCountriesSearch, getCountriesOrder, getDBActivities, getCountriesFilter } from "../../redux/actions"
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { useState, useEffect } from "react";
 import CountriesCards from "../CountriesCards/CountriesCards";
+import Select from 'react-select'
 
-export const Home = ({ countries, search, getDBCountriesName, getDBCountries, getCountriesOrder }) => {
+export const Home = ({ countries, search, activities, getDBCountriesSearch, getDBCountries, getCountriesOrder, getDBActivities, getCountriesFilter }) => {
   const [name, setName] = useState("")
-  const [order, setOrder] = useState({ type: "asc", attribute: "name" })
+  const [order, setOrder] = useState({ type: "asc", attribute: { value: "order", label: "Order" } })
+  const [filter, setFilter] = useState({
+    objContinent: {
+      value: "select continent",
+      label: "Select continent"
+    },
+    objActivity: {
+      value: "select activity",
+      label: "Select activity"
+    },
+    type: {
+      value: "filter",
+      label: "Filter"
+    }
+  })
 
   useEffect(() => {
     if (!countries.length) {
-      if (search) getDBCountriesName(search)
+      if (search) getDBCountriesSearch("name", search)
       else getDBCountries()
       console.log("se cargo countries")
     }
     // eslint-disable-next-line
   }, [])
 
+  useEffect(() => {
+    if (filter.type.value === "activity" && !activities.length) {
+      // if (search) getDBCountriesSearch(search)
+      // else 
+      getDBActivities()
+      console.log("se cargo activities")
+    }
+    // eslint-disable-next-line
+  }, [filter.type])
+
   const handleInputChangeSearch = async (e) => {
     e.preventDefault()
     setName(e.target.value)
-    await getDBCountriesName(e.target.value)
+    await getDBCountriesSearch("name", e.target.value)
   }
   const [items, setItems] = useState([])
   const [currentPage, setCurrentPage] = useState(0)
@@ -40,6 +65,7 @@ export const Home = ({ countries, search, getDBCountriesName, getDBCountries, ge
     console.log("renderizado")
     // eslint-disable-next-line
   }, [countries])
+  //console.log([...new Set(countries.map(e=>e.continent))].map(e => ({ value: e.toLowerCase(),label: e})))
 
   const handlerButtonNumbers = (e) => {
     e.preventDefault()
@@ -78,41 +104,90 @@ export const Home = ({ countries, search, getDBCountriesName, getDBCountries, ge
     e.preventDefault()
     let type = order.type === "asc" ? "desc" : "asc"
     setOrder({ ...order, type })
-    getCountriesOrder(type, order.attribute)
+    getCountriesOrder(type, order.attribute.value)
   }
-  const handleOrderAttribute = (e) => {
-    e.preventDefault()
-    let attribute = order.attribute === "name" ? "population" : "name"
-    setOrder({ ...order, attribute })
-    getCountriesOrder(order.type, attribute)
 
-  }
+  const optionsContinents = [
+    {
+      label: "North America",
+      value: "north america"
+    },
+    {
+      label: "Oceania",
+      value: "oceania"
+    },
+    {
+      label: "Europe",
+      value: "europe"
+    },
+    {
+      label: "South America",
+      value: "south america"
+    }, {
+      label: "Africa",
+      value: "africa"
+    }, {
+      label: "Asia",
+      value: "asia"
+    }, {
+      label: "Antarctica",
+      value: "antarctica"
+    }
+  ]
   return (
     <div className="home">
       <Link to='/'>
-        <button className="btn-outline-secondary">Volver</button>
+        <button style={{ backgroundColor: "#ffadad", borderColor: "#ed0505", color: "black" }} className="button-primary">
+          Volver
+        </button>
       </Link>
       <div className="top-navegation-main">
-        <form onSubmit={async (e) => {
+        <form style={{ display: "flex" }} onSubmit={async (e) => {
           e.preventDefault()
-          await getDBCountriesName(name)
+          await getDBCountriesSearch("name", name)
         }}>
-          <div className="search">
-            <h1>Home</h1>
-            <input className="inputSearch" placeholder="Search country" type="text" name="search" onChange={handleInputChangeSearch} />
-            <button className="btnSuccess" type="submit">search</button>
+          <h1>Home</h1>
+          <div className="divNavegation">
+            <input placeholder="Search country" type="text" name="search" onChange={handleInputChangeSearch} />
+            <button className="button-primary" type="submit">search</button>
+          </div>
+          <div className="divNavegation" >
+            <Select className="selectFilters" onChange={(e) => {
+              getCountriesOrder(order.type, e.value)
 
+              setOrder({ ...order, attribute: e })
+            }
+
+            } defaultValue={order.attribute} options={[{ value: "name", label: "Name" }, { value: "population", label: "Population" }]} />
+            {order.attribute.value === "population" ? <button className="button-primary" onClick={handleOrderType}>{order.type.toUpperCase()}</button> : null}
+          </div>
+          <div className="divNavegation" >
+            <Select className="selectFilters" onChange={(e) => {
+              setFilter({ ...filter, type: e })
+            }
+
+            } defaultValue={filter.type} options={[{ value: "continent", label: "Continent" }, { value: "activity", label: "Activity" }]} />
+            {filter.type.value === "activity" ?
+              <Select className="selectFilters" onChange={e => {
+                setFilter({ ...filter, objActivity: e })
+                getCountriesFilter(e.countries)
+              }} options={activities} defaultValue={filter.objActivity}
+              />
+              :
+              filter.type.value === "continent" ?
+                <Select className="selectFilters" onChange={e => {
+                  setFilter({ ...filter, objContinent: e })
+                  getDBCountriesSearch("continent", e.label)
+                }} options={optionsContinents} defaultValue={filter.objContinent}
+                />
+                : null}
           </div>
         </form>
+
         <Link to={'/activities/create'}>
           <button className="button-primary">Create activity</button>
         </Link>
       </div>
-
-      {order.attribute === "population" ? <button className="button-primary" onClick={handleOrderType}>{order.type}</button> : null}
-      <button className="button-primary" onClick={handleOrderAttribute}>{order.attribute}</button>
-
-
       <div className="paginated">
         <h1>Pagina {currentPage}</h1>
         <div className="paginatedButtons">
@@ -131,11 +206,12 @@ export const Home = ({ countries, search, getDBCountriesName, getDBCountries, ge
 
 export const mapStateToProps = (state) => {
   return {
-    countries: state.countries
+    countries: state.countries,
+    activities: state.activities
   }
 }
 export const mapDispatchToProps = (dispatch) => {
-  return bindActionCreators({ getDBCountries, getDBCountriesName, getCountriesOrder }, dispatch)
+  return bindActionCreators({ getDBCountries, getDBCountriesSearch, getCountriesOrder, getDBActivities, getCountriesFilter }, dispatch)
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home);

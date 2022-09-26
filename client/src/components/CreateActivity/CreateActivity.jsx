@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
 import { getDBCountries, postCreateActivity } from '../../redux/actions'
 
 function CreateActivity({ countries, getDBCountries, postCreateActivity }) {
-    const [input, setInput] = useState({ name: '', difficulty: '', duration: '', season: 'Verano', countries_id: [], countries: [], countrySelect: [], country: "" })
+    const [input, setInput] = useState({ name: '', difficulty: '', duration: '', season: 'Verano', countries_id: [], countries: [], countrySelect: [], country: "", created: "" })
     const [errors, setErrors] = useState({});
     const [ini, setIni] = useState(false);
     const [optionsCountries, setOptionsCountries] = useState({ options: [] });
@@ -38,14 +38,14 @@ function CreateActivity({ countries, getDBCountries, postCreateActivity }) {
     ]
 
     useEffect(() => {
-        if (!countries.length) {
-            getDBCountries()
-            console.log("se cargo countries")
-        }
+
+        getDBCountries()
+        console.log("se cargo countries")
         // eslint-disable-next-line
     }, [])
+
     useEffect(() => {
-        if (!optionsCountries.options.length) {
+        
             setOptionsCountries({
                 ...optionsCountries, options: countries.map(({ id, name, imageFlag, continent, capital, subregion, area, population }) => {
                     return {
@@ -62,99 +62,103 @@ function CreateActivity({ countries, getDBCountries, postCreateActivity }) {
                     }
                 })
             })
-        }
-
-
-        console.log(optionsCountries.options.length)
 
         // eslint-disable-next-line
     }, [countries])
     return (
-        <div className='activity-countries'>
-            <form className='create-activity' onSubmit={async (e) => {
-                e.preventDefault()
-                if (ini) {
-                    if (!Object.keys(errors).length) {
-                        const response = await postCreateActivity(input)
-                        alert(response)
+        <div>
+
+            {<h2 style={{ color: "green" }}>{input.created.data}</h2>}
+
+            <div className='activity-countries'>
+                <form className='create-activity' onSubmit={async (e) => {
+                    e.preventDefault()
+                    if (ini) {
+                        if (!Object.keys(errors).length) {
+                            const response = await postCreateActivity(input)
+                            console.log(response)
+                            setInput({ ...input, created: response })
+                        } else {
+                            alert(Object.values(errors).join(", "))
+                        }
                     } else {
-                        alert(Object.values(errors).join(", "))
-                    }
-                } else {
-                    setErrors(validate({ ...input }))
-                    setIni(true)
-                }
-            }}>
-                <div className='divTextBox'>
-                    <label id='lblName'>Name*</label>
-                    <input className={errors.name && 'danger'} type="text" name="name" onChange={handleInputChange} value={input.name} placeholder="Escribir name" />
-                    {errors.name && (<p className="danger">{errors.name}</p>)}
-                </div>
-                <div className='divTextBox'>
-                    <label>Difficulty • (1-5)</label>
-                    <input className={errors.difficulty && 'danger'} type="number" name="difficulty" maxLength={1} onChange={handleInputChange} value={input.difficulty} placeholder="Escribir difficulty" />
-                    {errors.difficulty && (
-                        <p className="danger">{errors.difficulty}</p>
-                    )}
-                </div >
-                <div className='divTextBox'>
-                    <label>Duration • (1-120 min)</label>
-                    <input className={errors.duration && 'danger'} type="number" name="duration" maxLength={2} onChange={handleInputChange} value={input.duration} placeholder="Escribir duration" />
-                    {errors.duration && (
-                        <p className="danger">{errors.duration}</p>
-                    )}
-                </div >
-                <div className='divTextBox'>
-                    <label>Season</label>
-                    <Select onChange={(e) => setInput({ ...input, season: e.label })} options={optionsReason} defaultValue={optionsReason[0]} className="form-select" />
-                    {errors.season && (<p className="danger">{errors.season}</p>)}
-                </div>
-                <button className='button-primary' type="submit">Create</button>
-            </form>
-            <form className='add-countries' onSubmit={(e) => {
-                e.preventDefault()
-                if (ini) {
-                    if (!input.countries_id.includes(input.country) && input.country.length) {
-                        const arrcountries_id = [...input.countries_id, input.country]
-                        const arrcountries = [...input.countries, input.countrySelect]
-                        setInput({
-                            ...input, countries_id: arrcountries_id, countries: arrcountries
-                        })
-                        setErrors(validate({ ...input, countries_id: arrcountries_id, countries: arrcountries }))
-                    }
-                } else {
-                    setErrors(validate({ ...input }))
-                    setIni(true)
-                }
-            }}>
-                <div className='divTextBox'>
-                    <label>Countries</label>
-                    <Select onChange={(e) => {
-                        setErrors(validate({ ...input, country: e.value, countrySelect: e }))
+                        setErrors(validate({ ...input }))
                         setIni(true)
-                        setInput({ ...input, country: e.value, countrySelect: e })
-                    }} options={optionsCountries.options} defaultValue={optionsCountries.options[0]} className={errors.country ? "form-select-country-danger" : "form-select"} />
-                    {errors.country && (<p className="danger">Add a country</p>)}
-
-                    <button className='button-primary' type="submit">Add country</button>
-                </div>
-                <div className='div-grid-countries'>
-                    {input.countries_id.length ? (input.countries.map((e,i) => {
-                        return (<div key={e.id} className='divTextBox'><div className='divFlagClose'><img src={e.imageFlag} alt="" /><button onClick={(e)=>{
-                            e.preventDefault()
-                            input.countries_id.splice(i, 1)
-                            input.countries.splice(i, 1)
-                            setErrors(validate({ ...input}))
+                    }
+                }}>
+                    <h1>Create your tourist activity</h1>
+                    <div className='divTextBox'>
+                        <label id='lblName'>Name*</label>
+                        <input className={errors.name && 'danger'} type="text" name="name" onChange={handleInputChange} value={input.name} placeholder="Write name" />
+                        {errors.name && (<p className="danger">{errors.name}</p>)}
+                    </div>
+                    <div className='divTextBox'>
+                        <label>Difficulty • (1-5)</label>
+                        <input className={errors.difficulty && 'danger'} type="number" name="difficulty" maxLength={1} onChange={handleInputChange} value={input.difficulty} placeholder="Write difficulty" />
+                        {errors.difficulty && (
+                            <p className="danger">{errors.difficulty}</p>
+                        )}
+                    </div >
+                    <div className='divTextBox'>
+                        <label>Duration • (1-120 min)</label>
+                        <input className={errors.duration && 'danger'} type="number" name="duration" maxLength={2} onChange={handleInputChange} value={input.duration} placeholder="Write duration" />
+                        {errors.duration && (
+                            <p className="danger">{errors.duration}</p>
+                        )}
+                    </div >
+                    <div className='divTextBox'>
+                        <label>Season</label>
+                        <Select onChange={(e) => setInput({ ...input, season: e.label })} options={optionsReason} defaultValue={optionsReason[0]} className="form-select" />
+                        {errors.season && (<p className="danger">{errors.season}</p>)}
+                    </div>
+                    <button className='button-primary' type="submit">Create</button>
+                </form>
+                <form className='add-countries' onSubmit={(e) => {
+                    e.preventDefault()
+                    if (ini) {
+                        if (!input.countries_id.includes(input.country) && input.country.length) {
+                            const arrcountries_id = [...input.countries_id, input.country]
+                            const arrcountries = [...input.countries, input.countrySelect]
+                            setInput({
+                                ...input, countries_id: arrcountries_id, countries: arrcountries
+                            })
+                            setErrors(validate({ ...input, countries_id: arrcountries_id, countries: arrcountries }))
+                        }
+                    } else {
+                        setErrors(validate({ ...input }))
+                        setIni(true)
+                    }
+                }}>
+                    <div className='divTextBox'>
+                        <label>Add countries</label>
+                        <Select onChange={(e) => {
+                            setErrors(validate({ ...input, country: e.value, countrySelect: e }))
                             setIni(true)
-                            setInput({...input, countries_id: [...input.countries_id], countries: [...input.countries]})
+                            setInput({ ...input, country: e.value, countrySelect: e })
+                        }} options={optionsCountries.options} defaultValue={optionsCountries.options[0]} className={errors.country ? "form-select-country-danger" : "form-select"} />
+                        {errors.country && (<p className="danger">Add a country</p>)}
 
-                        }} className='btnoutlineprimary'>X</button></div><label>{e.name}</label><label>{e.continent}</label></div>)
-                    })) : (<div className='divTextBox'><label>No countries added yet</label></div>)}
+                        <button className='button-primary' type="submit">Add country</button>
+                    </div>
+                    <h2>Countries added</h2>
+                    <div className='div-grid-countries'>
+                        {input.countries_id.length ? (input.countries.map((e, i) => {
+                            return (<div key={e.id} className='divTextBox'><div className='divFlagClose'><img src={e.imageFlag} alt="" /><button onClick={(e) => {
+                                e.preventDefault()
+                                input.countries_id.splice(i, 1)
+                                input.countries.splice(i, 1)
+                                setErrors(validate({ ...input }))
+                                setIni(true)
+                                setInput({ ...input, countries_id: [...input.countries_id], countries: [...input.countries] })
 
-                </div>
+                            }} className='btnoutlineprimary'>X</button></div><label>{e.name}</label><label>{e.continent}</label></div>)
+                        })) : (<div className='divTextBox'><label>No countries added yet</label></div>)}
 
-            </form>
+                    </div>
 
+                </form>
+
+            </div>
         </div>
     )
 }
