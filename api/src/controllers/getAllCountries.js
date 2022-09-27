@@ -45,7 +45,8 @@ const getDBCountry = async (id) => {
 }
 const getDBCountryName = async ({ name, capital, continent }) => {
     await getDBCountries()
-    const value = (name ? name : capital?capital:continent).normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    const value = (name ? name : capital?capital:continent)
+    console.log(value)
     const db = await Country.findAll({
         where: Sequelize.where(Sequelize.fn('REPLACE', Sequelize.fn('REPLACE', Sequelize.fn('REPLACE', Sequelize.fn('REPLACE', Sequelize.fn('REPLACE', Sequelize.fn('LOWER', Sequelize.col(name ? 'name' : capital?'capital':'continent')), 'á', 'a'), 'é', 'e'), 'í', 'i'), 'ó', 'o'), 'ú', 'u'),
             'LIKE', Sequelize.fn('LOWER', '%' + value + '%'))
